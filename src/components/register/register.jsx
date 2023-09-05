@@ -23,7 +23,7 @@ export default function register() {
     try {
       const res = await axios.post(BASE_URL + "/auth/local/register", user);
       setError({});
-      // clear form
+      // clear form using default
       setFirstName("");
       setLastName("");
       setPassword("");
