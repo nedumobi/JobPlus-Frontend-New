@@ -4,24 +4,33 @@ import "../styles/form.scss";
 import { Link } from "react-router-dom";
 import Alert from "../alert/Alert";
 
+const BASE_URL = import.meta.env.VITE_STRAPI_API_URL;
 // create a function to post user to backend
 
 export default function register() {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [firstname, setFirstName] = useState("");
+  const [lastname, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState({});
 
   const registerUser = async (user) => {
+    if (password !== confirmPassword) {
+      setError({ message: "Password do not match" });
+      return;
+    }
     try {
-      const res = await axios.post(
-        "http://localhost:1337/api/auth/local/register",
-        user
-      );
-      console.log(res);
+      const res = await axios.post(BASE_URL + "/auth/local/register", user);
+      setError({});
+      // clear form
+      setFirstName("");
+      setLastName("");
+      setPassword("");
+      setEmail("");
+      setConfirmPassword("");
     } catch (err) {
-      console.log(err.response);
+      setError(err.response.data.error);
     }
   };
 
@@ -29,8 +38,8 @@ export default function register() {
     e.preventDefault();
 
     const user = {
-      firstName,
-      lastName,
+      firstname,
+      lastname,
       username: email,
       email,
       password,
@@ -41,7 +50,7 @@ export default function register() {
 
   return (
     <>
-      <Alert type="error" message="There is an error" />
+      {error.message && <Alert type="error" error={error} />}
       <form className="form form--page" onSubmit={handleSubmit}>
         <div className="form__group form__group--page">
           <label className="form__label">First name</label>
@@ -49,7 +58,7 @@ export default function register() {
             className="form__field"
             type="text"
             placeholder="First name"
-            value={firstName}
+            value={firstname}
             onChange={(e) => setFirstName(e.target.value)}
           />
         </div>
@@ -60,7 +69,7 @@ export default function register() {
             className="form__field"
             type="text"
             placeholder="Last name"
-            value={lastName}
+            value={lastname}
             onChange={(e) => setLastName(e.target.value)}
           />
         </div>
